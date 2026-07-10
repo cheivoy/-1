@@ -86,10 +86,28 @@ curl -X POST http://localhost:3000/api/districts/tucheng/projects \
 
 ## 設計說明
 
+網站分五個分頁，對應原分析書的完整內容：
+
+| 分頁 | 內容（對應原文） |
+| --- | --- |
+| 市場總論 | 前言、第一章市場現況與六大核心因素、第三章六大投資趨勢 |
+| 區域分析 | 15 個區域完整數據，可篩選／排序／搜尋，點卡片看詳情與建案 |
+| 投資策略 | 依預算策略、升值與租金排行榜、三大推薦、十大推薦建案、不建議追價區域、海外投資人原則（Part 5–6） |
+| 香港投資人 | 投資優勢、成本與稅務、個人 vs 公司、公司持有手冊、購屋 SOP、KYC、十大地雷（第七、八章） |
+| 實戰案例 | 五大實戰案例、五年配置比較、最終投資排序（第九章） |
+
 - 以純白／灰為底，深玉綠為唯一重點色，黃銅色僅用於 A+ 與細節。
-- 每張卡片有「五年漲幅區間」視覺條，讓投資人一眼比較。
-- 點卡片開啟右側詳情：市場行情、交通開發、升值動能、風險、建議產品、相關建案。
-- 「投資須知」分頁整理契稅、房屋稅、地價稅、房地合一稅等重點。
+- 每張區域卡片有「五年漲幅區間」視覺條，讓投資人一眼比較。
+- 所有內容都來自 `data.json`，改文字不用動程式。
+
+## 部署（Cloudflare Pages，連 GitHub 自動更新）
+
+1. 把整個專案放上 GitHub。
+2. Cloudflare → Workers & Pages → Create → Pages → Connect to Git，選該 repo。
+3. 設定：Framework preset `None`、Build command 留空、**Build output directory 填 `public`**。
+4. Deploy 完成得到 `xxx.pages.dev` 網址。之後在 GitHub 改 `data.json` 並 commit，網站會自動更新。
+
+註：Cloudflare Pages 只跑前端（`server.js` 會被忽略），加建案用「改 data.json」即可。
 
 ## 提醒
 

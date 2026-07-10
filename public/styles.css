@@ -403,15 +403,227 @@ select:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px v
   border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px;
 }
 
+/* ═══ 補充章節共用 ═══ */
+.strategy, .hk, .cases { margin: 32px 0 60px; }
+.sec-title {
+  font-family: "Noto Serif TC", serif; font-weight: 700; font-size: clamp(22px, 3vw, 28px);
+  margin: 0 0 8px;
+}
+.sec-note { color: var(--ink-45); font-size: 14px; margin: 0 0 22px; max-width: 780px; line-height: 1.7; }
+.strategy .ov-h, .hk .ov-h, .cases .ov-h { margin-top: 40px; }
+.strategy > .ov-h:first-of-type { margin-top: 30px; }
+
+.std-table {
+  width: 100%; border-collapse: collapse; background: var(--card);
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+}
+.std-table th, .std-table td {
+  text-align: left; padding: 12px 16px; font-size: 13.5px; border-top: 1px solid var(--line);
+}
+.std-table thead th { background: #f0efea; color: var(--ink-70); font-weight: 500; border-top: 0; }
+.std-table .fg { font-family: "Noto Serif TC", serif; font-weight: 600; color: var(--jade); font-size: 13px; }
+.std-table .fa { font-weight: 600; }
+
+/* 星比例條 */
+.dots { display: inline-block; width: 66px; height: 7px; background: #e8e6df; border-radius: 999px; overflow: hidden; vertical-align: middle; }
+.dots b { display: block; height: 100%; background: var(--jade); border-radius: 999px; }
+
+/* ── 六大趨勢 ─────────────────────────── */
+.ov-trends { margin-top: 44px; }
+.trend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.trend {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 22px; box-shadow: var(--shadow); border-left: 3px solid var(--jade);
+}
+.trend-no { font-size: 11.5px; letter-spacing: .1em; color: var(--brass); font-weight: 500; }
+.trend-title { font-family: "Noto Serif TC", serif; font-size: 17px; font-weight: 600; margin: 6px 0 8px; }
+.trend-desc { font-size: 13.5px; color: var(--ink-70); line-height: 1.75; margin: 0; }
+
+/* ── 投資策略：預算 ───────────────────── */
+.budget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.budget {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 22px; box-shadow: var(--shadow);
+}
+.budget-amt {
+  font-family: "Noto Serif TC", serif; font-size: 19px; font-weight: 700; color: var(--jade);
+  padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 14px;
+}
+.budget-areas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.budget-areas span {
+  font-size: 12.5px; background: var(--jade-soft); color: var(--jade); border-radius: 999px; padding: 4px 12px;
+}
+.budget-tactic { font-size: 13.5px; color: var(--ink-70); line-height: 1.7; margin: 0; }
+
+/* ── 排行榜 ───────────────────────────── */
+.rank-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.rank-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 22px; box-shadow: var(--shadow);
+}
+.rank-cap { font-family: "Noto Serif TC", serif; font-weight: 600; font-size: 15px; margin-bottom: 12px; }
+.rank-list { list-style: none; margin: 0; padding: 0; counter-reset: none; }
+.rank-list li {
+  display: flex; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.rank-list li:first-child { border-top: 0; }
+.rk {
+  flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: #edece7;
+  color: var(--ink-70); font-size: 12px; font-weight: 600; display: grid; place-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.rk.top { background: var(--jade); color: #fff; }
+.rk-area { flex: 1; }
+.rk-val { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--jade); }
+
+/* ── 三大推薦 ─────────────────────────── */
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.pick {
+  background: var(--jade); color: #fff; border-radius: var(--radius); padding: 24px 22px;
+  box-shadow: var(--shadow);
+}
+.pick-type {
+  font-size: 11.5px; letter-spacing: .08em; background: rgba(255,255,255,.18); color: #fff;
+  padding: 3px 10px; border-radius: 999px;
+}
+.pick h4 { font-family: "Noto Serif TC", serif; font-size: 22px; font-weight: 700; margin: 12px 0 8px; }
+.pick p { font-size: 13.5px; line-height: 1.75; margin: 0; color: rgba(255,255,255,.9); }
+
+/* ── 推薦建案 ─────────────────────────── */
+.rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.rec-grid.small-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); margin-top: 16px; }
+.rec-item {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.rec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.rec-g { font-family: "Noto Serif TC", serif; font-weight: 600; font-size: 13px; color: #fff; padding: 2px 10px; border-radius: 999px; }
+.rec-g.ap { background: var(--grade-aplus); }
+.rec-g.a { background: var(--grade-a); }
+.rec-head h4 { font-family: "Noto Serif TC", serif; font-size: 18px; font-weight: 600; margin: 0; }
+.rec-prod { font-size: 13px; color: var(--ink-70); margin: 0 0 12px; }
+.rec-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.rec-tags span { font-size: 11.5px; color: var(--jade); background: var(--jade-soft); border-radius: 999px; padding: 3px 10px; }
+.rec-price { font-size: 13px; font-weight: 600; color: var(--ink); margin: 0 0 8px; }
+.rec-note { font-size: 12.5px; color: var(--ink-45); font-style: italic; margin: 0; line-height: 1.6; }
+.rec-item.small .rec-head h4 { font-size: 16px; }
+
+/* ── 不建議追價 ───────────────────────── */
+.avoid-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.avoid-item {
+  background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--brass);
+  border-radius: var(--radius-sm); padding: 16px 18px;
+}
+.avoid-item h4 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
+.avoid-item p { font-size: 13px; color: var(--ink-70); margin: 0; line-height: 1.7; }
+
+/* ── 海外投資人原則 兩欄 ─────────────── */
+.ov-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ov-col { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+.col-cap { font-family: "Noto Serif TC", serif; font-weight: 600; font-size: 15px; margin-bottom: 12px; }
+.ov-col.prefer .col-cap { color: var(--jade); }
+.ov-col.avoid .col-cap { color: var(--brass); }
+.ov-col ul { list-style: none; margin: 0; padding: 0; }
+.ov-col li { position: relative; padding: 7px 0 7px 20px; font-size: 13.5px; color: var(--ink-70); border-top: 1px solid var(--line); }
+.ov-col li:first-child { border-top: 0; }
+.ov-col.prefer li::before { content: "✓"; position: absolute; left: 0; color: var(--jade); font-weight: 700; }
+.ov-col.avoid li::before { content: "×"; position: absolute; left: 2px; color: var(--brass); font-weight: 700; }
+
+/* ── 香港投資人：優勢 ─────────────────── */
+.adv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-bottom: 8px; }
+.adv {
+  display: flex; gap: 14px; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow);
+}
+.adv-ic { font-family: "Noto Serif TC", serif; font-size: 22px; color: var(--brass); line-height: 1; flex: 0 0 auto; }
+.adv h4 { font-size: 15px; font-weight: 600; margin: 0 0 5px; }
+.adv p { font-size: 13px; color: var(--ink-70); margin: 0; line-height: 1.7; }
+
+.tax-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.hk-p { font-size: 14px; color: var(--ink-70); line-height: 1.8; margin: 0; }
+
+/* ── 個人 vs 公司表 ───────────────────── */
+.pvc-table {
+  width: 100%; border-collapse: collapse; background: var(--card);
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+}
+.pvc-table th, .pvc-table td { padding: 11px 16px; font-size: 13.5px; border-top: 1px solid var(--line); text-align: center; }
+.pvc-table thead th { background: #f0efea; color: var(--ink-70); font-weight: 500; border-top: 0; }
+.pvc-table th:first-child, .pvc-table td:first-child { text-align: left; }
+.pvc-item { font-weight: 500; }
+.advice-box { margin-top: 16px; background: var(--jade-soft); border-radius: var(--radius-sm); padding: 6px 18px; }
+.advice-row { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 12px 0; border-top: 1px solid rgba(31,93,76,.12); font-size: 13.5px; }
+.advice-row:first-child { border-top: 0; }
+.advice-row b { color: var(--jade); flex: 0 0 auto; }
+.advice-row span { color: var(--ink-70); }
+
+/* ── 公司優缺點 ───────────────────────── */
+.pc-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pc-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+.pc-card.pros { border-top: 3px solid var(--jade); }
+.pc-card.cons { border-top: 3px solid var(--brass); }
+.pc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.pc-row:first-of-type { border-top: 0; }
+.pc-row b { font-size: 13.5px; font-weight: 600; display: block; }
+.pc-row span { font-size: 12px; color: var(--ink-45); }
+
+/* ── SOP 流程 ─────────────────────────── */
+.sop { list-style: none; counter-reset: none; margin: 0; padding: 0; }
+.sop li { display: flex; align-items: center; gap: 12px; padding: 7px 0; font-size: 14px; color: var(--ink-70); }
+.sop-n {
+  flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: var(--jade); color: #fff;
+  font-size: 12px; font-weight: 600; display: grid; place-items: center;
+}
+
+/* ── chip 清單（KYC / 年度成本）──────── */
+.chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.chip-list span { font-size: 12.5px; color: var(--ink-70); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+
+/* ── 十大地雷 ─────────────────────────── */
+.mines-block { border-left: 3px solid var(--brass); }
+.mines { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
+.mines li { display: flex; gap: 10px; padding: 8px 0; font-size: 13.5px; color: var(--ink-70); border-top: 1px solid var(--line); }
+.mines li:nth-child(1), .mines li:nth-child(2) { border-top: 0; }
+.mine-n { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: #f3ede1; color: var(--brass); font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+
+/* ── 實戰案例 ─────────────────────────── */
+.case-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+.case {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 22px; box-shadow: var(--shadow);
+}
+.case-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+.case-budget { font-family: "Noto Serif TC", serif; font-size: 22px; font-weight: 700; color: var(--jade); }
+.case-twd { font-size: 12.5px; color: var(--ink-45); margin-top: 2px; }
+.case-meta { display: flex; flex-direction: column; gap: 3px; text-align: right; font-size: 11.5px; color: var(--ink-45); }
+.case-meta span b, .case-meta span { white-space: nowrap; }
+.case-aud { font-size: 13px; color: var(--ink-70); margin: 0 0 12px; line-height: 1.6; }
+.case-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.case-area { font-size: 12.5px; font-weight: 600; color: #fff; background: var(--jade); border-radius: 999px; padding: 4px 12px; }
+.case-prod { font-size: 12.5px; color: var(--ink-70); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.case-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.case-table th, .case-table td { text-align: left; padding: 8px 0; font-size: 13px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.case-table th { color: var(--ink-45); font-weight: 400; width: 52%; }
+.case-table td { font-weight: 500; }
+.case-table tr:first-child th, .case-table tr:first-child td { border-top: 0; }
+.case-verdict { font-size: 13px; color: var(--jade); background: var(--jade-soft); border-radius: var(--radius-sm); padding: 12px 14px; margin: 0; line-height: 1.7; }
+
 /* ── RWD ──────────────────────────────── */
 @media (max-width: 720px) {
   .header-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .tabs { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
+  .tab { white-space: nowrap; padding: 8px 14px; }
   .stat-strip { grid-template-columns: repeat(2, 1fr); }
   .controls { gap: 10px; }
   .search { flex-basis: 100%; }
   .panel-body { padding: 8px 22px 44px; }
   .guide-row { flex-direction: column; gap: 4px; }
   .guide-row dt { flex-basis: auto; }
+  .rank-2col, .tax-2col, .pc-2col, .ov-2col { grid-template-columns: 1fr; }
+  .mines { grid-template-columns: 1fr; }
+  .mines li:nth-child(2) { border-top: 1px solid var(--line); }
+  .std-table { display: block; overflow-x: auto; white-space: nowrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {

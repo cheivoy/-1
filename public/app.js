@@ -13,7 +13,11 @@ const DATA_URL = 'data.json';
 const state = {
   meta: null,
   overview: null,
+  trends: null,
+  strategy: null,
   guide: null,
+  hk: null,
+  cases: null,
   districts: [],   // 原始資料
   city: 'all',
   grade: 'all',
@@ -52,7 +56,11 @@ async function loadData() {
 
     state.meta = data.meta || {};
     state.overview = data.overview || null;
+    state.trends = data.trends || null;
+    state.strategy = data.strategy || null;
     state.guide = data.guide || null;
+    state.hk = data.hk || null;
+    state.cases = data.cases || null;
     state.districts = Array.isArray(data.districts) ? data.districts : [];
 
     if (state.districts.length === 0) throw new Error('資料為空');
@@ -61,7 +69,9 @@ async function loadData() {
     renderStats();
     render();          // 首次渲染卡片
     renderOverview();
-    renderGuide();
+    renderStrategy();
+    renderHK();
+    renderCases();
     bindEvents();
   } catch (err) {
     showError(err);
@@ -364,28 +374,269 @@ function renderOverview() {
     <div class="ov-factors">
       <h3 class="ov-h">${esc(o.factors?.title || '核心因素')}</h3>
       <div class="factor-grid">${factorCards}</div>
+    </div>
+    ${trendsBlock()}`;
+}
+
+// 六大投資趨勢（併入市場總論）
+function trendsBlock() {
+  if (!state.trends) return '';
+  const t = state.trends;
+  const cards = (t.items || []).map((x) => `
+    <div class="trend">
+      <span class="trend-no">趨勢 ${x.no}</span>
+      <h4 class="trend-title">${esc(x.title)}</h4>
+      <p class="trend-desc">${esc(x.desc)}</p>
+    </div>`).join('');
+  return `
+    <div class="ov-trends">
+      <h3 class="ov-h">${esc(t.title)}</h3>
+      <div class="trend-grid">${cards}</div>
     </div>`;
 }
 
-/* ── 投資須知 ───────────────────────────── */
+/* ── 小工具：星級與排名徽章 ─────────────── */
+const dots = (n) => `<span class="dots"><b style="width:${(n / 5) * 100}%"></b></span>`;
+const rankBadge = (n) => `<span class="rk${n <= 3 ? ' top' : ''}">${n}</span>`;
 
-function renderGuide() {
-  if (!state.guide) return;
+/* ── 投資策略（Part 5 + Part 6）─────────── */
+
+function renderStrategy() {
+  if (!state.strategy) return;
+  const s = state.strategy;
+
+  const budgets = (s.byBudget || []).map((b) => `
+    <div class="budget">
+      <div class="budget-amt">${esc(b.budget)}</div>
+      <div class="budget-areas">${b.areas.map((a) => `<span>${esc(a)}</span>`).join('')}</div>
+      <p class="budget-tactic">${esc(b.tactic)}</p>
+    </div>`).join('');
+
+  const upRank = (s.upsideRank || []).map((r) => `
+    <li>${rankBadge(r.rank)}<span class="rk-area">${esc(r.area)}</span><span class="rk-val">${esc(r.range)}</span></li>`).join('');
+  const ylRank = (s.yieldRank || []).map((r) => `
+    <li>${rankBadge(r.rank)}<span class="rk-area">${esc(r.area)}</span><span class="rk-val">${esc(r.rate)}</span></li>`).join('');
+
+  const picks = (s.topPicks || []).map((p) => `
+    <div class="pick">
+      <span class="pick-type">${esc(p.type)}</span>
+      <h4>${esc(p.name)}</h4>
+      <p>${esc(p.reason)}</p>
+    </div>`).join('');
+
+  const aplus = (s.recommendedProjects?.aplus || []).map((p) => `
+    <div class="rec-item">
+      <div class="rec-head"><span class="rec-g ap">A+</span><h4>${esc(p.name)}</h4></div>
+      <p class="rec-prod">建議產品：${esc(p.products)}</p>
+      <div class="rec-tags">${(p.reasons || []).map((r) => `<span>✓ ${esc(r)}</span>`).join('')}</div>
+      <p class="rec-price">${esc(p.priceHint)}</p>
+      ${p.note ? `<p class="rec-note">${esc(p.note)}</p>` : ''}
+    </div>`).join('');
+  const aGrade = (s.recommendedProjects?.a || []).map((p) => `
+    <div class="rec-item small">
+      <div class="rec-head"><span class="rec-g a">A</span><h4>${esc(p.name)}</h4></div>
+      <p class="rec-note">${esc(p.note)}</p>
+      <p class="rec-price">${esc(p.priceHint)}</p>
+    </div>`).join('');
+
+  const avoid = (s.avoid || []).map((a) => `
+    <div class="avoid-item"><h4>${esc(a.area)}</h4><p>${esc(a.reason)}</p></div>`).join('');
+
+  const ov = s.overseasNotes || {};
+  const prefer = (ov.prefer || []).map((x) => `<li>${esc(x)}</li>`).join('');
+  const ovAvoid = (ov.avoid || []).map((x) => `<li>${esc(x)}</li>`).join('');
+
+  $('#strategy').innerHTML = `
+    <h2 class="sec-title">${esc(s.title)}</h2>
+
+    <h3 class="ov-h">依預算置產策略</h3>
+    <div class="budget-grid">${budgets}</div>
+
+    <h3 class="ov-h">升值潛力 vs 租金投報 排行（2026–2031）</h3>
+    <div class="rank-2col">
+      <div class="rank-card"><div class="rank-cap">升值潛力排行</div><ol class="rank-list">${upRank}</ol></div>
+      <div class="rank-card"><div class="rank-cap">租金投報排行</div><ol class="rank-list">${ylRank}</ol></div>
+    </div>
+
+    <h3 class="ov-h">三大最值得長期持有生活圈</h3>
+    <div class="pick-grid">${picks}</div>
+
+    <h3 class="ov-h">十大推薦建案（非業配）</h3>
+    <div class="rec-grid">${aplus}</div>
+    <div class="rec-grid small-grid">${aGrade}</div>
+
+    <h3 class="ov-h">不建議追價區域</h3>
+    <p class="sec-note">以下並非不能買，而是目前價格下風險與報酬的平衡較不具吸引力。</p>
+    <div class="avoid-grid">${avoid}</div>
+
+    <h3 class="ov-h">海外投資人選案原則</h3>
+    <div class="ov-2col">
+      <div class="ov-col prefer"><div class="col-cap">優先選擇</div><ul>${prefer}</ul></div>
+      <div class="ov-col avoid"><div class="col-cap">建議避免</div><ul>${ovAvoid}</ul></div>
+    </div>
+    <p class="pd-note" style="margin-top:14px">${esc(ov.budgetPick || '')}</p>`;
+}
+
+/* ── 香港投資人（第七 + 八章）─────────────── */
+
+function renderHK() {
+  const hk = state.hk;
   const g = state.guide;
-  const blocks = (g.sections || []).map((sec) => `
+  if (!hk && !g) return;
+
+  // 優勢
+  const adv = (hk?.suitability?.advantages || []).map((a) => `
+    <div class="adv">
+      <span class="adv-ic">${esc(a.icon)}</span>
+      <div><h4>${esc(a.title)}</h4><p>${esc(a.desc)}</p></div>
+    </div>`).join('');
+
+  // 成本（沿用 guide 的 sections）
+  const costBlocks = (g?.sections || []).map((sec) => `
     <div class="guide-block">
       <h3>${esc(sec.heading)}</h3>
       <dl>${(sec.items || []).map((it) =>
-        `<div class="guide-row"><dt>${esc(it.label)}</dt><dd>${esc(it.value)}</dd></div>`).join('')}
-      </dl>
+        `<div class="guide-row"><dt>${esc(it.label)}</dt><dd>${esc(it.value)}</dd></div>`).join('')}</dl>
     </div>`).join('');
 
-  $('#guide').innerHTML = `
-    <p class="guide-intro">${esc(g.intro)}</p>
-    ${blocks}
-    <p class="guide-disc">${esc(g.disclaimer)}</p>`;
+  // 稅率表
+  const tr = hk?.taxRates || {};
+  const taxTable = (rows, cols) => `<table class="pd-table"><tbody>${rows.map((r) =>
+    `<tr><th>${esc(r[cols[0]])}</th><td>${esc(r[cols[1]])}</td></tr>`).join('')}</tbody></table>`;
 
-  if (g.disclaimer) $('#footerDisclaimer').textContent = g.disclaimer;
+  // 個人 vs 公司
+  const pvc = hk?.personVsCompany;
+  const pvcRows = (pvc?.rows || []).map((r) => `
+    <tr><td class="pvc-item">${esc(r.item)}</td><td>${dots(r.person)}</td><td>${dots(r.company)}</td></tr>`).join('');
+  const pvcAdvice = (pvc?.advice || []).map((a) => `
+    <div class="advice-row"><b>${esc(a.scale)}</b><span>${esc(a.text)}</span></div>`).join('');
+
+  // 公司持有
+  const c = hk?.company || {};
+  const pros = (c.pros || []).map((p) => `
+    <div class="pc-row"><div><b>${esc(p.t)}</b><span>${esc(p.d)}</span></div>${dots(p.s)}</div>`).join('');
+  const cons = (c.cons || []).map((p) => `
+    <div class="pc-row"><div><b>${esc(p.t)}</b><span>${esc(p.d)}</span></div>${dots(p.s)}</div>`).join('');
+  const sop = (c.sop || []).map((step, i) => `
+    <li><span class="sop-n">${i + 1}</span>${esc(step)}</li>`).join('');
+  const kycDocs = (c.kyc?.docs || []).map((x) => `<span>${esc(x)}</span>`).join('');
+  const mines = (c.landmines || []).map((m, i) => `
+    <li><span class="mine-n">${i + 1}</span>${esc(m)}</li>`).join('');
+  const annual = (c.annualCost || []).map((x) => `<span>${esc(x)}</span>`).join('');
+
+  $('#hk').innerHTML = `
+    <h2 class="sec-title">${esc(hk?.suitability?.title || '香港投資人攻略')}</h2>
+    <div class="adv-grid">${adv}</div>
+
+    <h3 class="ov-h">置產成本與稅務</h3>
+    ${costBlocks}
+
+    <div class="tax-2col">
+      <div class="guide-block"><h3>房屋稅</h3>${taxTable(tr.houseTax || [], ['use', 'rate'])}</div>
+      <div class="guide-block"><h3>地價稅</h3>${taxTable(tr.landTax || [], ['use', 'rate'])}</div>
+    </div>
+    <div class="guide-block">
+      <h3>房地合一稅（自然人）</h3>
+      ${taxTable(tr.capitalGains || [], ['hold', 'rate'])}
+      <p class="pd-note" style="margin-top:12px">${esc(tr.capitalGainsNote || '')}</p>
+    </div>
+    <div class="guide-block"><h3>出租所得</h3><p class="hk-p">${esc(tr.rentNote || '')}</p></div>
+
+    <h3 class="ov-h">${esc(pvc?.title || '個人 vs 公司持有')}</h3>
+    <table class="pvc-table">
+      <thead><tr><th>比較項目</th><th>香港個人</th><th>香港公司</th></tr></thead>
+      <tbody>${pvcRows}</tbody>
+    </table>
+    <div class="advice-box">${pvcAdvice}</div>
+
+    <h3 class="ov-h">${esc(c.title || '香港公司持有完整手冊')}</h3>
+    <p class="sec-note">${esc(c.intro || '')}</p>
+    <div class="pc-2col">
+      <div class="pc-card pros"><div class="col-cap">五大優點</div>${pros}</div>
+      <div class="pc-card cons"><div class="col-cap">七大缺點</div>${cons}</div>
+    </div>
+
+    <div class="guide-block">
+      <h3>購屋流程 SOP</h3>
+      <ol class="sop">${sop}</ol>
+    </div>
+
+    <div class="guide-block">
+      <h3>銀行 KYC 最在意的事</h3>
+      <p class="hk-p">${esc(c.kyc?.intro || '')}</p>
+      <div class="chip-list">${kycDocs}</div>
+    </div>
+
+    <div class="guide-block">
+      <h3>股東曾破產，有影響嗎？</h3>
+      <p class="hk-p">${esc(c.bankruptcy || '')}</p>
+    </div>
+
+    <div class="guide-block mines-block">
+      <h3>香港公司十大地雷</h3>
+      <ol class="mines">${mines}</ol>
+    </div>
+
+    <div class="guide-block">
+      <h3>香港公司每年固定成本</h3>
+      <div class="chip-list">${annual}</div>
+    </div>
+
+    <p class="guide-disc">${esc(g?.disclaimer || '')}</p>`;
+
+  if (g?.disclaimer) $('#footerDisclaimer').textContent = g.disclaimer;
+}
+
+/* ── 五大實戰案例（第九章）──────────────── */
+
+function renderCases() {
+  if (!state.cases) return;
+  const c = state.cases;
+
+  const items = (c.items || []).map((x) => `
+    <div class="case">
+      <div class="case-head">
+        <div>
+          <div class="case-budget">${esc(x.budget)}</div>
+          <div class="case-twd">${esc(x.twd)}</div>
+        </div>
+        <div class="case-meta">
+          <span>適合 ${stars(x.fit)}</span>
+          <span>風險 ${stars(x.risk)}</span>
+        </div>
+      </div>
+      <p class="case-aud">${esc(x.audience)}</p>
+      <div class="case-tags">
+        <span class="case-area">${esc(x.area)}</span>
+        <span class="case-prod">${esc(x.product)}</span>
+      </div>
+      <table class="case-table"><tbody>${(x.rows || []).map((r) =>
+        `<tr><th>${esc(r[0])}</th><td>${esc(r[1])}</td></tr>`).join('')}</tbody></table>
+      <p class="case-verdict">${esc(x.verdict)}</p>
+    </div>`).join('');
+
+  const sumRows = (c.summaryTable || []).map((r) =>
+    `<tr><td>${esc(r.budget)}</td><td>${esc(r.hold)}</td><td>${esc(r.way)}</td></tr>`).join('');
+
+  const finalRows = (c.finalRanking || []).map((r) =>
+    `<tr><td><span class="fg">${esc(r.grade)}</span></td><td class="fa">${esc(r.area)}</td><td>${esc(r.fit)}</td><td>${esc(r.risk)}</td><td>${esc(r.hold)}</td></tr>`).join('');
+
+  $('#cases').innerHTML = `
+    <h2 class="sec-title">${esc(c.title)}</h2>
+    <p class="sec-note">${esc(c.note)}</p>
+    <div class="case-grid">${items}</div>
+
+    <h3 class="ov-h">五年投資配置比較</h3>
+    <table class="std-table">
+      <thead><tr><th>預算</th><th>建議持有</th><th>推薦方式</th></tr></thead>
+      <tbody>${sumRows}</tbody>
+    </table>
+
+    <h3 class="ov-h">最終投資建議排序（2026–2031）</h3>
+    <table class="std-table">
+      <thead><tr><th>評級</th><th>區域</th><th>適合</th><th>風險</th><th>建議持有</th></tr></thead>
+      <tbody>${finalRows}</tbody>
+    </table>`;
 }
 
 /* ── 檢視切換 ───────────────────────────── */
@@ -398,7 +649,9 @@ function switchView(view) {
   });
   $('#view-overview').hidden = view !== 'overview';
   $('#view-districts').hidden = view !== 'districts';
-  $('#view-guide').hidden = view !== 'guide';
+  $('#view-strategy').hidden = view !== 'strategy';
+  $('#view-hk').hidden = view !== 'hk';
+  $('#view-cases').hidden = view !== 'cases';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
