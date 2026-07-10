@@ -71,7 +71,6 @@ async function loadData() {
     renderOverview();
     renderStrategy();
     renderHK();
-    renderCases();
     bindEvents();
   } catch (err) {
     showError(err);
@@ -525,8 +524,7 @@ function renderHK() {
   const annual = (c.annualCost || []).map((x) => `<span>${esc(x)}</span>`).join('');
 
   $('#hk').innerHTML = `
-    <h2 class="sec-title">${esc(hk?.suitability?.title || '香港投資人攻略')}</h2>
-    <div class="adv-grid">${adv}</div>
+    <h2 class="sec-title">香港投資人：成本、稅務與公司持有</h2>
 
     <h3 class="ov-h">置產成本與稅務</h3>
     ${costBlocks}
@@ -565,16 +563,6 @@ function renderHK() {
       <h3>銀行 KYC 最在意的事</h3>
       <p class="hk-p">${esc(c.kyc?.intro || '')}</p>
       <div class="chip-list">${kycDocs}</div>
-    </div>
-
-    <div class="guide-block">
-      <h3>股東曾破產，有影響嗎？</h3>
-      <p class="hk-p">${esc(c.bankruptcy || '')}</p>
-    </div>
-
-    <div class="guide-block mines-block">
-      <h3>香港公司十大地雷</h3>
-      <ol class="mines">${mines}</ol>
     </div>
 
     <div class="guide-block">
@@ -651,7 +639,6 @@ function switchView(view) {
   $('#view-districts').hidden = view !== 'districts';
   $('#view-strategy').hidden = view !== 'strategy';
   $('#view-hk').hidden = view !== 'hk';
-  $('#view-cases').hidden = view !== 'cases';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

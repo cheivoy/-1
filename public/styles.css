@@ -612,7 +612,8 @@ select:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px v
 /* ── RWD ──────────────────────────────── */
 @media (max-width: 720px) {
   .header-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
-  .tabs { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
+  .tabs { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab { white-space: nowrap; padding: 8px 14px; }
   .stat-strip { grid-template-columns: repeat(2, 1fr); }
   .controls { gap: 10px; }
@@ -624,6 +625,29 @@ select:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px v
   .mines { grid-template-columns: 1fr; }
   .mines li:nth-child(2) { border-top: 1px solid var(--line); }
   .std-table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 0 16px; }
+  .site-header { padding: 0; }
+  .header-inner { padding-top: 16px; padding-bottom: 12px; }
+  .brand-title { font-size: 26px; }
+  .stat { padding: 14px 14px; }
+  .stat-num { font-size: 22px; }
+  .card, .factor, .trend, .budget, .rank-card, .rec-item, .pc-card, .ov-col, .pick, .guide-block { padding-left: 18px; padding-right: 18px; }
+  .pd-title { font-size: 26px; }
+
+  /* 三欄比較表在窄螢幕縮排、縮小比例條 */
+  .dots { width: 46px; height: 6px; }
+  .pvc-table th, .pvc-table td { padding: 10px 8px; font-size: 12.5px; }
+  .pc-row span { font-size: 11px; }
+
+  /* 排行榜與建議在窄螢幕更緊湊 */
+  .rank-list li { font-size: 13px; gap: 10px; }
+  .advice-row { flex-direction: column; gap: 2px; }
+
+  /* 稅表與市場行情表避免擠壓 */
+  .pd-table th, .pd-table td { font-size: 12.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
