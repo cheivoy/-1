@@ -483,13 +483,6 @@ function renderHK() {
   const g = state.guide;
   if (!hk && !g) return;
 
-  // 優勢
-  const adv = (hk?.suitability?.advantages || []).map((a) => `
-    <div class="adv">
-      <span class="adv-ic">${esc(a.icon)}</span>
-      <div><h4>${esc(a.title)}</h4><p>${esc(a.desc)}</p></div>
-    </div>`).join('');
-
   // 成本（沿用 guide 的 sections）
   const costBlocks = (g?.sections || []).map((sec) => `
     <div class="guide-block">
@@ -510,23 +503,93 @@ function renderHK() {
   const pvcAdvice = (pvc?.advice || []).map((a) => `
     <div class="advice-row"><b>${esc(a.scale)}</b><span>${esc(a.text)}</span></div>`).join('');
 
-  // 公司持有
+  // 公司持有：優缺點與年度成本
   const c = hk?.company || {};
   const pros = (c.pros || []).map((p) => `
     <div class="pc-row"><div><b>${esc(p.t)}</b><span>${esc(p.d)}</span></div>${dots(p.s)}</div>`).join('');
   const cons = (c.cons || []).map((p) => `
     <div class="pc-row"><div><b>${esc(p.t)}</b><span>${esc(p.d)}</span></div>${dots(p.s)}</div>`).join('');
-  const sop = (c.sop || []).map((step, i) => `
-    <li><span class="sop-n">${i + 1}</span>${esc(step)}</li>`).join('');
-  const kycDocs = (c.kyc?.docs || []).map((x) => `<span>${esc(x)}</span>`).join('');
-  const mines = (c.landmines || []).map((m, i) => `
-    <li><span class="mine-n">${i + 1}</span>${esc(m)}</li>`).join('');
   const annual = (c.annualCost || []).map((x) => `<span>${esc(x)}</span>`).join('');
 
-  $('#hk').innerHTML = `
-    <h2 class="sec-title">香港投資人：成本、稅務與公司持有</h2>
+  // ── 公司購入（置頂詳細區塊）──
+  const cp = hk?.companyPurchase || {};
+  const legalCards = (cp.legal?.items || []).map((x) => {
+    const key = x.law.startsWith('★');
+    return `<div class="legal-card${key ? ' key' : ''}">
+      <div class="legal-law">${esc(x.law)}</div>
+      <p class="legal-point">${esc(x.point)}</p>
+    </div>`;
+  }).join('');
+  const eligItems = (cp.eligibility?.items || []).map((x) => `<li>${esc(x)}</li>`).join('');
+  const procSteps = (cp.process?.steps || []).map((s, i) => `
+    <div class="pstep">
+      <span class="pstep-n">${i + 1}</span>
+      <div class="pstep-body"><b>${esc(s.step)}</b><p>${esc(s.desc)}</p></div>
+    </div>`).join('');
+  const docItems = (cp.documents?.company || []).map((x) => `<li>${esc(x)}</li>`).join('');
+  const cpTax = (cp.companyTax?.items || []).map((x) => `
+    <div class="ctax"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></div>`).join('');
 
-    <h3 class="ov-h">置產成本與稅務</h3>
+  const companyPurchaseBlock = cp.title ? `
+    <div class="cp">
+      <span class="cp-eyebrow">重點章節</span>
+      <h2 class="sec-title">${esc(cp.title)}</h2>
+      <p class="cp-intro">${esc(cp.intro)}</p>
+
+      <div class="cp-sub"><h3 class="cp-h">${esc(cp.legal?.title || '法規架構')}</h3>
+        <div class="legal-grid">${legalCards}</div>
+      </div>
+
+      <div class="cp-2col">
+        <div class="cp-sub">
+          <h3 class="cp-h">${esc(cp.eligibility?.title || '前提條件')}</h3>
+          <ul class="check-list">${eligItems}</ul>
+        </div>
+        <div class="cp-sub">
+          <h3 class="cp-h">${esc(cp.documents?.title || '需準備文件')}</h3>
+          <ul class="doc-list">${docItems}</ul>
+          <p class="doc-note">${esc(cp.documents?.authNote || '')}</p>
+        </div>
+      </div>
+
+      <div class="cp-sub">
+        <h3 class="cp-h">${esc(cp.process?.title || '購屋流程')}</h3>
+        <div class="pstep-flow">${procSteps}</div>
+      </div>
+
+      <div class="cp-2col">
+        <div class="cp-sub risk">
+          <h3 class="cp-h">${esc(cp.kycRisk?.title || '銀行審查與陸資風險')}</h3>
+          <p class="hk-p">${esc(cp.kycRisk?.text || '')}</p>
+        </div>
+        <div class="cp-sub">
+          <h3 class="cp-h">${esc(cp.companyTax?.title || '公司持有相關稅負')}</h3>
+          <div class="ctax-list">${cpTax}</div>
+        </div>
+      </div>
+
+      <div class="cp-sub">
+        <h3 class="cp-h">公司持有：優點與缺點</h3>
+        <div class="pc-2col">
+          <div class="pc-card pros"><div class="col-cap">五大優點</div>${pros}</div>
+          <div class="pc-card cons"><div class="col-cap">七大缺點</div>${cons}</div>
+        </div>
+      </div>
+
+      <div class="cp-sub">
+        <h3 class="cp-h">香港公司每年固定成本</h3>
+        <div class="chip-list">${annual}</div>
+      </div>
+
+      <p class="cp-disc">${esc(cp.disclaimer || '')}</p>
+    </div>` : '';
+
+  $('#hk').innerHTML = `
+    ${companyPurchaseBlock}
+
+    <div class="hk-divider"></div>
+
+    <h2 class="sec-title">置產成本與稅務（個人與公司通用）</h2>
     ${costBlocks}
 
     <div class="tax-2col">
@@ -546,29 +609,6 @@ function renderHK() {
       <tbody>${pvcRows}</tbody>
     </table>
     <div class="advice-box">${pvcAdvice}</div>
-
-    <h3 class="ov-h">${esc(c.title || '香港公司持有完整手冊')}</h3>
-    <p class="sec-note">${esc(c.intro || '')}</p>
-    <div class="pc-2col">
-      <div class="pc-card pros"><div class="col-cap">五大優點</div>${pros}</div>
-      <div class="pc-card cons"><div class="col-cap">七大缺點</div>${cons}</div>
-    </div>
-
-    <div class="guide-block">
-      <h3>購屋流程 SOP</h3>
-      <ol class="sop">${sop}</ol>
-    </div>
-
-    <div class="guide-block">
-      <h3>銀行 KYC 最在意的事</h3>
-      <p class="hk-p">${esc(c.kyc?.intro || '')}</p>
-      <div class="chip-list">${kycDocs}</div>
-    </div>
-
-    <div class="guide-block">
-      <h3>香港公司每年固定成本</h3>
-      <div class="chip-list">${annual}</div>
-    </div>
 
     <p class="guide-disc">${esc(g?.disclaimer || '')}</p>`;
 
