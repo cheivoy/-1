@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 雙北房市分析｜香港投資人快覽</title>
+  <meta name="description" content="台北市、新北市最具升值潛力區域深度分析，為香港投資人整理的雙北置產快覽。" />
+
+  <!-- Tailwind CSS（透過 CDN 引入，依你的需求） -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#f7f6f3',
+            ink: '#191b1f',
+            jade: '#1f5d4c',
+            brass: '#a8874e',
+          },
+          fontFamily: {
+            serif: ['"Noto Serif TC"', 'serif'],
+            sans: ['"Noto Sans TC"', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- 字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- 自訂樣式 -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="bg-paper text-ink font-sans antialiased">
+
+  <!-- ── 頁首 ────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <span class="brand-eyebrow">2026 · Taipei &amp; New Taipei</span>
+        <h1 class="brand-title">雙北房市分析</h1>
+        <p class="brand-sub" id="brandSub">為香港投資人整理的置產快覽</p>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="主要區塊">
+        <button class="tab" data-view="overview" role="tab" aria-selected="false">市場總論</button>
+        <button class="tab is-active" data-view="districts" role="tab" aria-selected="true">區域分析</button>
+        <button class="tab" data-view="guide" role="tab" aria-selected="false">投資須知</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ── 市場總論檢視 ──────────────────────────── -->
+    <section id="view-overview" class="view" hidden>
+      <div id="overview" class="overview"></div>
+    </section>
+
+    <!-- ── 區域分析檢視 ──────────────────────────── -->
+    <section id="view-districts" class="view">
+
+      <!-- 概覽數字 -->
+      <div class="stat-strip" id="statStrip" aria-live="polite"></div>
+
+      <!-- 篩選 / 排序 控制列 -->
+      <div class="controls">
+        <div class="control search">
+          <svg viewBox="0 0 24 24" class="search-ic" aria-hidden="true"><path d="M11 4a7 7 0 1 0 4.6 12.3l4 4 1.4-1.4-4-4A7 7 0 0 0 11 4Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/></svg>
+          <input id="search" type="search" placeholder="搜尋區域，如：北士科、土城…" autocomplete="off" aria-label="搜尋區域" />
+        </div>
+
+        <div class="control seg" id="cityFilter" role="group" aria-label="城市篩選">
+          <button class="chip is-active" data-city="all">全部</button>
+          <button class="chip" data-city="台北市">台北市</button>
+          <button class="chip" data-city="新北市">新北市</button>
+        </div>
+
+        <div class="control seg" id="gradeFilter" role="group" aria-label="評級篩選">
+          <button class="chip is-active" data-grade="all">全評級</button>
+          <button class="chip" data-grade="A+">A+</button>
+          <button class="chip" data-grade="A">A</button>
+          <button class="chip" data-grade="A-">A-</button>
+          <button class="chip" data-grade="B+">B+</button>
+        </div>
+
+        <div class="control select-wrap">
+          <label for="sort" class="sr-only">排序方式</label>
+          <select id="sort" aria-label="排序方式">
+            <option value="score">依投資評分</option>
+            <option value="upside">依五年漲幅</option>
+            <option value="yield">依租金投報率</option>
+            <option value="priceLow">依房價（低→高）</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="result-count" id="resultCount"></p>
+
+      <!-- 卡片網格（由 app.js 動態渲染） -->
+      <div id="grid" class="grid"></div>
+
+      <!-- 空狀態 -->
+      <div id="empty" class="empty" hidden>
+        <p>找不到符合條件的區域。</p>
+        <button class="link-btn" id="resetFilters">清除篩選條件</button>
+      </div>
+    </section>
+
+    <!-- ── 投資須知檢視 ──────────────────────────── -->
+    <section id="view-guide" class="view" hidden>
+      <div id="guide" class="guide"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p id="footerNote"></p>
+      <p class="disclaimer" id="footerDisclaimer"></p>
+    </div>
+  </footer>
+
+  <!-- ── 詳情側欄（點卡片開啟） ─────────────────── -->
+  <div id="panelOverlay" class="panel-overlay" hidden></div>
+  <aside id="panel" class="panel" aria-hidden="true" aria-label="區域詳情" tabindex="-1">
+    <button class="panel-close" id="panelClose" aria-label="關閉詳情">&times;</button>
+    <div id="panelBody" class="panel-body"></div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
