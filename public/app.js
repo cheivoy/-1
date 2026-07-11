@@ -448,9 +448,6 @@ function renderStrategy() {
   $('#strategy').innerHTML = `
     <h2 class="sec-title">${esc(s.title)}</h2>
 
-    <h3 class="ov-h">依預算置產策略</h3>
-    <div class="budget-grid">${budgets}</div>
-
     <h3 class="ov-h">升值潛力 vs 租金投報 排行（2026–2031）</h3>
     <div class="rank-2col">
       <div class="rank-card"><div class="rank-cap">升值潛力排行</div><ol class="rank-list">${upRank}</ol></div>
