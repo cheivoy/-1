@@ -21,6 +21,12 @@
   --grade-aminus: #6b7b74;
   --grade-bplus: #9a8a63;
 
+  /* 建案價格級距：同一玉綠色系由淺到深，對應預算由低到高 */
+  --tier1: #eef3f0; --tier1-ink: #1f5d4c;
+  --tier2: #c7ddd3; --tier2-ink: #1a4c3f;
+  --tier3: #5f9a86; --tier3-ink: #ffffff;
+  --tier4: #1f5d4c; --tier4-ink: #ffffff;
+
   --radius: 14px;
   --radius-sm: 9px;
   --shadow: 0 1px 2px rgba(25, 27, 31, .04), 0 8px 24px rgba(25, 27, 31, .05);
@@ -271,6 +277,12 @@ select:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px v
 .pd-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
 .pd-badge { font-size: 12.5px; padding: 4px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line-strong); color: var(--ink-70); }
 .pd-badge b { color: var(--ink); font-weight: 600; }
+.pd-badge-proj {
+  background: var(--jade); border-color: var(--jade); color: #fff; text-decoration: none;
+  cursor: pointer;
+}
+.pd-badge-proj b { color: #fff; }
+.pd-badge-proj:hover { background: #17493b; }
 
 .pd-summary { font-size: 15px; color: var(--ink-70); line-height: 1.8; margin-bottom: 26px; }
 
@@ -303,27 +315,46 @@ select:focus { outline: none; border-color: var(--jade); box-shadow: 0 0 0 3px v
   padding: 14px 16px; font-size: 14px; color: var(--ink-70); line-height: 1.7;
 }
 
-/* 建案清單（可後續新增） */
+/* 建案清單：依價格級距分組（t1 最淺 → t4 最深，同一玉綠色系的漸層，代表預算由低到高）*/
+.pd-section-proj { scroll-margin-top: 60px; }
 .proj { margin-top: 10px; }
+.proj-tier { margin-bottom: 18px; }
+.proj-tier:last-child { margin-bottom: 0; }
+.proj-tier-head {
+  display: inline-block; font-size: 12.5px; font-weight: 600; letter-spacing: .01em;
+  padding: 4px 12px; border-radius: 999px; margin-bottom: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.proj-tier-head[data-tier="t1"] { background: var(--tier1); color: var(--tier1-ink); }
+.proj-tier-head[data-tier="t2"] { background: var(--tier2); color: var(--tier2-ink); }
+.proj-tier-head[data-tier="t3"] { background: var(--tier3); color: var(--tier3-ink); }
+.proj-tier-head[data-tier="t4"] { background: var(--tier4); color: var(--tier4-ink); }
+
+.proj-grid { display: grid; gap: 12px; }
 .proj-item {
   border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--card);
-  padding: 16px 18px; margin-bottom: 12px;
+  padding: 16px 18px;
 }
 .proj-item h4 {
   font-family: "Noto Serif TC", serif; font-size: 16px; font-weight: 600; margin: 0 0 4px;
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .proj-status { font-size: 11px; font-weight: 400; color: var(--brass); border: 1px solid var(--brass); border-radius: 999px; padding: 1px 8px; }
+.proj-addr { font-size: 12px; color: var(--ink-45); margin: 0 0 8px; }
 .proj-intro { font-size: 13.5px; color: var(--ink-70); margin: 0 0 10px; line-height: 1.7; }
-.proj-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.proj-price { font-size: 13px; color: var(--ink-45); font-variant-numeric: tabular-nums; }
-.proj-link {
-  display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500;
-  color: #fff; background: var(--jade); padding: 7px 14px; border-radius: 999px;
-  text-decoration: none; transition: background .15s ease;
+.proj-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.proj-price { font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.proj-links { display: flex; align-items: center; gap: 8px; }
+.proj-map, .proj-link {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 500;
+  padding: 6px 12px; border-radius: 999px; text-decoration: none; transition: background .15s ease;
 }
+.proj-map { color: var(--jade); background: var(--jade-soft); border: 1px solid transparent; }
+.proj-map:hover { background: #e2ece7; }
+.proj-map svg { width: 13px; height: 13px; fill: currentColor; }
+.proj-link { color: #fff; background: var(--jade); }
 .proj-link:hover { background: #17493b; }
-.proj-link svg { width: 14px; height: 14px; fill: currentColor; }
+.proj-link svg { width: 13px; height: 13px; fill: currentColor; }
 .proj-empty {
   border: 1px dashed var(--line-strong); border-radius: var(--radius-sm);
   padding: 18px; text-align: center; color: var(--ink-45); font-size: 13.5px;

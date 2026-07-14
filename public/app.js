@@ -243,28 +243,64 @@ function marketRows(x) {
     `<tr><th>${esc(k)}</th><td class="${hk ? 'pd-hk' : ''}">${esc(v)}</td></tr>`).join('');
 }
 
+const TIER_LABELS = {
+  t1: '1000–2000萬', t2: '2000–3000萬', t3: '3000–4000萬', t4: '5000萬以上',
+};
+const PIN_SVG = '<svg viewBox="0 0 24 24"><path d="M12 21s7-6.8 7-12.4A7 7 0 1 0 5 8.6C5 14.2 12 21 12 21zm0-9.5a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8z"/></svg>';
+
+function mapsUrl(addr) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+}
+
+function projectCardHTML(p) {
+  return `
+    <div class="proj-item">
+      <h4>${esc(p.name)}${p.status ? `<span class="proj-status">${esc(p.status)}</span>` : ''}</h4>
+      ${p.addr ? `<p class="proj-addr">${esc(p.addr)}</p>` : ''}
+      <p class="proj-intro">${esc(p.intro)}</p>
+      <div class="proj-meta">
+        <span class="proj-price">${esc(p.priceHint || '')}</span>
+        <span class="proj-links">
+          ${p.addr ? `<a class="proj-map" href="${mapsUrl(p.addr)}" target="_blank" rel="noopener">${PIN_SVG}地圖</a>` : ''}
+          ${p.url ? `<a class="proj-link" href="${esc(p.url)}" target="_blank" rel="noopener">
+            前往建案 <svg viewBox="0 0 24 24"><path d="M14 3v2h3.6l-9.3 9.3 1.4 1.4L19 6.4V10h2V3h-7zM5 5h5V3H3v18h18v-7h-2v5H5V5z"/></svg>
+          </a>` : ''}
+        </span>
+      </div>
+    </div>`;
+}
+
 function projectsHTML(x) {
   const list = x.projects || [];
   if (list.length === 0) {
     return `<div class="proj-empty">此區域尚未加入建案。<br>可於 <code>data.json</code> 的 <code>projects</code> 陣列新增。</div>`;
   }
-  return list.map((p) => `
-    <div class="proj-item">
-      <h4>${esc(p.name)}${p.status ? `<span class="proj-status">${esc(p.status)}</span>` : ''}</h4>
-      <p class="proj-intro">${esc(p.intro)}</p>
-      <div class="proj-meta">
-        <span class="proj-price">${esc(p.priceHint || '')}</span>
-        ${p.url ? `<a class="proj-link" href="${esc(p.url)}" target="_blank" rel="noopener">
-          前往建案 <svg viewBox="0 0 24 24"><path d="M14 3v2h3.6l-9.3 9.3 1.4 1.4L19 6.4V10h2V3h-7zM5 5h5V3H3v18h18v-7h-2v5H5V5z"/></svg>
-        </a>` : ''}
-      </div>
+
+  // 沒有 tier 欄位的舊資料，直接列在最後，不分組
+  const tiers = ['t1', 't2', 't3', 't4'];
+  const grouped = tiers
+    .map((t) => ({ t, items: list.filter((p) => p.tier === t) }))
+    .filter((g) => g.items.length > 0);
+  const untiered = list.filter((p) => !tiers.includes(p.tier));
+
+  const groupsHTML = grouped.map((g) => `
+    <div class="proj-tier">
+      <span class="proj-tier-head" data-tier="${g.t}">${TIER_LABELS[g.t]}（${g.items.length}筆）</span>
+      <div class="proj-grid">${g.items.map(projectCardHTML).join('')}</div>
     </div>`).join('');
+
+  const untieredHTML = untiered.length
+    ? `<div class="proj-tier"><div class="proj-grid">${untiered.map(projectCardHTML).join('')}</div></div>`
+    : '';
+
+  return groupsHTML + untieredHTML;
 }
 
 function openPanel(id) {
   const x = state.districts.find((d) => d.id === id);
   if (!x) return;
 
+  const projN = (x.projects || []).length;
   const badges = [
     `評分 <b>${x.score}</b>`,
     `評級 <b>${esc(x.grade)}</b>`,
@@ -272,7 +308,8 @@ function openPanel(id) {
     `租金 <b>${stars(x.rentalYield)}</b>`,
     `風險 <b>${esc(x.riskLevel || '—')}</b>`,
     `建議持有 <b>${esc(x.holdYears || '—')}</b>`,
-  ].map((b) => `<span class="pd-badge">${b}</span>`).join('');
+  ].map((b) => `<span class="pd-badge">${b}</span>`).join('')
+    + (projN ? `<a href="#proj-${esc(x.id)}" class="pd-badge pd-badge-proj">建案 <b>${projN}</b> 筆 ↓</a>` : '');
 
   $('#panelBody').innerHTML = `
     <div class="pd-eyebrow">${esc(x.city)} · No.${x.rank} · 適合${esc(x.audience)}</div>
@@ -281,6 +318,13 @@ function openPanel(id) {
     <div class="pd-badges">${badges}</div>
 
     <p class="pd-summary">${esc(x.summary)}</p>
+
+    <div class="pd-section pd-section-proj" id="proj-${esc(x.id)}">
+      <h3 class="pd-h">相關建案</h3>
+      <div class="proj">${projectsHTML(x)}</div>
+      ${x.detailUrl ? `<a class="detail-cta" href="${esc(x.detailUrl)}" target="_blank" rel="noopener">
+        閱讀完整分析 →</a>` : ''}
+    </div>
 
     <div class="pd-section">
       <h3 class="pd-h">市場行情（2026）</h3>
@@ -310,13 +354,6 @@ function openPanel(id) {
     <div class="pd-section">
       <h3 class="pd-h">五年展望（2026–2031）</h3>
       <p class="pd-note">${esc(x.outlook)}</p>
-    </div>
-
-    <div class="pd-section">
-      <h3 class="pd-h">相關建案</h3>
-      <div class="proj">${projectsHTML(x)}</div>
-      ${x.detailUrl ? `<a class="detail-cta" href="${esc(x.detailUrl)}" target="_blank" rel="noopener">
-        閱讀完整分析 →</a>` : ''}
     </div>
   `;
 
